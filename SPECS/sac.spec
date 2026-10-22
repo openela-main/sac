@@ -1,6 +1,6 @@
 Name: sac
 Version: 1.3
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary: Java standard interface for CSS parser
 License: W3C
 #Original source: http://www.w3.org/2002/06/%{name}java-%{version}.zip
@@ -12,10 +12,19 @@ Source2: %{name}-MANIFEST.MF
 Source3: https://repo1.maven.org/maven2/org/w3c/css/sac/1.3/sac-1.3.pom
 URL: http://www.w3.org/Style/CSS/SAC/
 
+BuildRequires: java-21-openjdk-devel
+
 BuildRequires: ant
 BuildRequires: javapackages-local
 
 BuildArch: noarch
+
+%global java_home /usr/lib/jvm/java-21-openjdk
+
+# %%mvn_install auto-generates "Requires: java-headless", whose only provider on
+# RHEL 8 is java-1.8.0-openjdk-headless. Drop it and require java-21 explicitly.
+%global __requires_exclude ^java-headless$
+Requires: java-21-openjdk-headless >= 1:21
 
 %description
 SAC is a standard interface for CSS parsers, intended to work with CSS1, CSS2,
@@ -34,6 +43,7 @@ install -m 644 %{SOURCE1} build.xml
 find . -name "*.jar" -exec rm -f {} \;
 
 %build
+export JAVA_HOME=%{java_home}
 ant jar javadoc
 
 # inject OSGi manifest
@@ -51,6 +61,11 @@ jar ufm build/lib/sac.jar %{SOURCE2}
 %license COPYRIGHT.html
 
 %changelog
+* Thu Oct 08 2026 Tomas Popela <tpopela@redhat.com> - 1.3-29
+- OpenJDK 8 won't be supported anymore on RHEL 8 starting from November 2026,
+  move to OpenJDK 21
+- Resolves: RHEL-277813
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.3-28
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
