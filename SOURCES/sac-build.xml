@@ -33,8 +33,11 @@
   </target>
 
   <!-- Build classes -->
+  <!-- Build against the newest JDK available, but emit Java 8 bytecode so the
+       resulting jar can be consumed by every OpenJDK runtime shipped in RHEL 8
+       (8, 11, 17 and 21). Keep this in sync with the Requires in the spec. -->
   <target name="classes" depends="prepare">
-    <javac srcdir="${src}" destdir="${build.classes}" debug="off" optimize="on"/>
+    <javac srcdir="${src}" destdir="${build.classes}" debug="off" optimize="on" release="8"/>
     <copy todir="${build.classes}">
       <fileset dir="${src}">
         <include name="**/*.properties"/>

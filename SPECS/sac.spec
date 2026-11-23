@@ -1,6 +1,6 @@
 Name: sac
 Version: 1.3
-Release: 29%{?dist}
+Release: 30%{?dist}
 Summary: Java standard interface for CSS parser
 License: W3C
 #Original source: http://www.w3.org/2002/06/%{name}java-%{version}.zip
@@ -21,10 +21,13 @@ BuildArch: noarch
 
 %global java_home /usr/lib/jvm/java-21-openjdk
 
-# %%mvn_install auto-generates "Requires: java-headless", whose only provider on
-# RHEL 8 is java-1.8.0-openjdk-headless. Drop it and require java-21 explicitly.
+# The jar is compiled with --release 8 (see build.xml), so its bytecode is
+# consumable by every OpenJDK runtime shipped in RHEL 8. %%mvn_install would
+# auto-generate an unversioned "Requires: java-headless", whose only provider on
+# RHEL 8 is java-1.8.0-openjdk-headless; drop it and accept any supported LTS
+# runtime instead, without pulling in the EOL OpenJDK 8.
 %global __requires_exclude ^java-headless$
-Requires: java-21-openjdk-headless >= 1:21
+Requires: (java-11-headless or java-17-headless or java-21-headless)
 
 %description
 SAC is a standard interface for CSS parsers, intended to work with CSS1, CSS2,
@@ -61,6 +64,11 @@ jar ufm build/lib/sac.jar %{SOURCE2}
 %license COPYRIGHT.html
 
 %changelog
+* Wed Nov 04 2026 Tomas Popela <tpopela@redhat.com> - 1.3-30
+- Compile the jar with --release 8 so the bytecode stays consumable by all
+  OpenJDK runtimes supported on RHEL 8
+- Resolves: RHEL-301095
+
 * Thu Oct 08 2026 Tomas Popela <tpopela@redhat.com> - 1.3-29
 - OpenJDK 8 won't be supported anymore on RHEL 8 starting from November 2026,
   move to OpenJDK 21
